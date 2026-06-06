@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/opencode-go-models/sw.js', { scope: '/opencode-go-models/' })})}

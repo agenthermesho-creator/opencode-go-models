@@ -117,6 +117,11 @@ function App() {
   const [search, setSearch] = useState('')
   const [tierFilter, setTierFilter] = useState('all')
   const [sortKey, setSortKey] = useState('default')
+  const [expandedTiers, setExpandedTiers] = useState({})  // all collapsed by default
+
+  const toggleTier = (key) => {
+    setExpandedTiers(prev => ({ ...prev, [key]: !prev[key] }))
+  }
 
   const filtered = useMemo(() => {
     let result = [...models]
@@ -226,19 +231,31 @@ function App() {
             if (!tierModels || tierModels.length === 0) return null
             return (
               <section key={tierKey} className="tier-section">
-                <div className="tier-header">
-                  <div className="tier-dot" style={{ background: getTierColor(tierKey) }} />
-                  <h2>
-                    {tierMeta ? tierMeta.label : 'Extra'}
-                    <span className="tier-count"> — {tierMeta?.subtitle || 'No published caps'}</span>
-                  </h2>
+                <div className="tier-header collapsible" onClick={() => toggleTier(tierKey)}>
+                  <div className="tier-header-left">
+                    <div className="tier-dot" style={{ background: getTierColor(tierKey) }} />
+                    <h2>
+                      {tierMeta ? tierMeta.label : 'Extra'}
+                      <span className="tier-count"> — {tierMeta?.subtitle || 'No published caps'}</span>
+                    </h2>
+                  </div>
+                  <div className="tier-header-right">
+                    <span className="tier-model-count">{tierModels.length} models</span>
+                    <span className={`collapse-arrow ${expandedTiers[tierKey] ? 'open' : ''}`}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </span>
+                  </div>
                 </div>
-                <div className="model-grid">
-                  {tierModels.map((m, i) => (
-                    <div key={m.id} style={{ animationDelay: `${(i % 6) * 0.04}s` }}>
-                      <ModelCard model={m} />
-                    </div>
-                  ))}
+                <div className={`tier-body ${expandedTiers[tierKey] ? 'expanded' : ''}`}>
+                  <div className="model-grid">
+                    {tierModels.map((m, i) => (
+                      <div key={m.id} style={{ animationDelay: `${(i % 6) * 0.04}s` }}>
+                        <ModelCard model={m} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </section>
             )
